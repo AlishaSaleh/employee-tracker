@@ -65,19 +65,26 @@ startMenu = () => {
 
 // VIEW ALL EMPLOYEES FUNCTION
 viewAllEmployees = () => {
-  console.log('view employees');
-  connection.query(
-      "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
-     (err, res) => {
-        if (err) throw err;
-        console.table(res); 
-     }
-      )
+    console.log('view employees');
+    connection.query(
+        "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
+        (err, res) => {
+            if (err) throw err;
+            console.table(res);
+        }
+    )
 };
 
 // VIEW EMPLOYEES BY ROLE FUNCTION 
 viewEmployeeRoles = () => {
     console.log('view roles');
+    connection.query(
+        "SELECT employee.first_name, employee.last_name, role.title role FROM employee JOIN role ON employee.role_id = role.id",
+        (err, res) => {
+            if (err) throw err;
+            console.table(res);
+        }
+    )
 };
 
 // VIEW EMPLOYEES BY DEPARTMENT FUNCTION
