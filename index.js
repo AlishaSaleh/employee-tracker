@@ -4,6 +4,10 @@ const mysql = require('mysql');
 const cTable = require('console.table');
 require('dotenv').config();
 
+// Arrays to be populated
+var roleArr = [];
+var managerArr = [];
+
 // Connecting to database
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -24,8 +28,8 @@ startMenu = () => {
     inquirer.prompt(
         {
             type: 'list',
-            message: 'Welcome to the Employee Tracker! What would you like to do?',
             name: 'menuChoice',
+            message: 'Welcome to the Employee Tracker! What would you like to do?',
             choices: [
                 'View ALL employees',
                 'View employees by ROLE',
@@ -102,8 +106,65 @@ viewEmployeeDept = () => {
 // ADD EMPLOYEES FUNCTION
 addEmployee = () => {
     console.log('add employee');
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: 'Please enter their first name'
+        }, {
+            type: 'input',
+            name: 'lastName',
+            message: 'Please enter their last name'
+        }, {
+            type: 'list',
+            name: 'roleChoice',
+            message: 'Please select their role',
+            choices: selectRole()
+        }, {
+            type: 'list',
+            name: 'managerChoice',
+            message: 'Do they have a manager?',
+            choices: ['Yes', 'No']
+        }
+    ]).then((data) => {
+        if (data.managerChoice == 'Yes') {
+            selectManager();
+        }
+    })
 };
 
+selectRole = () => {
+    connection.query(
+        'SELECT * FROM role',
+        (err, res) => {
+            if (err) throw err;
+            for (let i = 0; i < res.length; i++) {
+                roleArr.push(res[i].title)
+            }
+        }
+    )
+    return roleArr;
+}
+
+selectManager = () => {
+    connection.query(
+        'SELECT first_name, last_name FROM employee WHERE manager_id IS NULL',
+        (err, res) => {
+            if (err) throw err;
+            for (let i = 0; i < res.length; i++) {
+                let managerName = `${res[i].first_name} ${res[i].last_name}`;
+                managerArr.push(managerName)
+            }
+            inquirer.prompt({
+                type: 'list',
+                name: 'manager',
+                message: 'Please enter their manager',
+                choices: managerArr
+            }).then((data) => { console.log(data.manager) })
+        }
+    )
+
+}
 // ADD ROLES FUNCTION
 addRole = () => {
     console.log('add role');
