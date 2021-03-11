@@ -79,7 +79,7 @@ viewAllEmployees = () => {
 viewEmployeeRoles = () => {
     console.log('view roles');
     connection.query(
-        "SELECT employee.first_name, employee.last_name, role.title role FROM employee JOIN role ON employee.role_id = role.id",
+        "SELECT employee.first_name, employee.last_name, role.title AS role FROM employee JOIN role ON employee.role_id = role.id;",
         (err, res) => {
             if (err) throw err;
             console.table(res);
@@ -90,6 +90,13 @@ viewEmployeeRoles = () => {
 // VIEW EMPLOYEES BY DEPARTMENT FUNCTION
 viewEmployeeDept = () => {
     console.log('view dept');
+    connection.query(
+        "SELECT employee.first_name, employee.last_name, department.name AS department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;",
+        (err, res) => {
+            if (err) throw err;
+            console.table(res);
+        }
+    )
 };
 
 // ADD EMPLOYEES FUNCTION
