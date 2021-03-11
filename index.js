@@ -37,7 +37,8 @@ startMenu = () => {
                 'ADD employee',
                 'ADD role',
                 'ADD department',
-                'UPDATE employee role'
+                'UPDATE employee role',
+                'Exit'
             ]
         }
     ).then((data) => {
@@ -63,6 +64,9 @@ startMenu = () => {
             case 'UPDATE employee role':
                 updateEmployeeRole();
                 break;
+            case 'Exit':
+                endSession();
+                break;
         }
     });
 };
@@ -71,10 +75,11 @@ startMenu = () => {
 viewAllEmployees = () => {
     console.log('view employees');
     connection.query(
-        "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
+        "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id LEFT JOIN employee m ON employee.manager_id = m.id;",
         (err, res) => {
             if (err) throw err;
             console.table(res);
+            startMenu();
         }
     )
 };
@@ -87,6 +92,7 @@ viewEmployeeRoles = () => {
         (err, res) => {
             if (err) throw err;
             console.table(res);
+            startMenu();
         }
     )
 };
@@ -99,6 +105,7 @@ viewEmployeeDept = () => {
         (err, res) => {
             if (err) throw err;
             console.table(res);
+            startMenu();
         }
     )
 };
@@ -128,7 +135,19 @@ addEmployee = () => {
         }
     ]).then((data) => {
         if (data.managerChoice == 'Yes') {
-            selectManager();
+            selectManager(data);
+        } else {
+            const roleId = selectRole().indexOf(data.roleChoice) + 1
+            connection.query("INSERT INTO employee SET ?", {
+                first_name: data.firstName,
+                last_name: data.lastName,
+                role_id: roleId,
+                manager_id: null
+            }, (err, res) => {
+                console.table(data)
+                startMenu();
+                if (err) throw err;
+            });
         }
     })
 };
@@ -146,7 +165,7 @@ selectRole = () => {
     return roleArr;
 }
 
-selectManager = () => {
+selectManager = (data) => {
     connection.query(
         'SELECT first_name, last_name FROM employee WHERE manager_id IS NULL',
         (err, res) => {
@@ -160,7 +179,19 @@ selectManager = () => {
                 name: 'manager',
                 message: 'Please enter their manager',
                 choices: managerArr
-            }).then((data) => { console.log(data.manager) })
+            }).then((response) => {
+                const roleId = selectRole().indexOf(data.roleChoice) + 1;
+                const managerId = response.manager; // need to find the employee ID of the manager
+                connection.query("INSERT INTO employee SET ?", {
+                    first_name: data.firstName,
+                    last_name: data.lastName,
+                    role_id: roleId,
+                    manager_id: managerId
+                }, (err, res) => {
+                    viewAllEmployees();
+                    if (err) throw err;
+                });
+            })
         }
     )
 
@@ -178,4 +209,10 @@ addDept = () => {
 // UPDATE EMPLOYEE ROLE FUNCTION
 updateEmployeeRole = () => {
     console.log('update employee');
+};
+
+endSession = () => {
+    console.log('Thank for using Employee Tracker. This session has now ended.');
+    connection.end();
+    process.exit();
 };
