@@ -7,7 +7,7 @@ require('dotenv').config();
 // Arrays to be populated
 var roleArr = [];
 var managerArr = [];
-var deptArr =[];
+var deptArr = [];
 
 // Connecting to database
 const connection = mysql.createConnection({
@@ -172,7 +172,7 @@ selectManager = (data) => {
         (err, res) => {
             if (err) throw err;
             for (let i = 0; i < res.length; i++) {
-                let managerName = {name: `${res[i].first_name} ${res[i].last_name}`, value: res[i].id};
+                let managerName = { name: `${res[i].first_name} ${res[i].last_name}`, value: res[i].id };
                 managerArr.push(managerName)
             }
             inquirer.prompt({
@@ -199,58 +199,46 @@ selectManager = (data) => {
 
 }
 
-selectDept = async () => {
-    await connection.query(
+// ADD ROLES FUNCTION
+addRole = () => {
+    console.log('add role');
+    connection.query(
         'SELECT * FROM department',
         (err, res) => {
             if (err) throw err;
             for (let i = 0; i < res.length; i++) {
-                deptArr.push({name: res[i].name, value: res[i].id});
-                // console.log(res[i]);
+                deptArr.push({ name: res[i].name, value: res[i].id });
             }
-            //console.log(err, res);
-            // console.log(deptArr);
-            return deptArr;
-        }
-        
-    )
-    
-    
-}
-// ADD ROLES FUNCTION
-addRole = () => {
-    console.log('add role');
-    var deptChoices = selectDept();
-    console.log(deptChoices);
-    inquirer.prompt([
-        {
-            type: 'input',
-            name: 'roleTitle',
-            message: 'What is the new role title?'
-        }, {
-            type: 'input',
-            name: 'roleSalary',
-            message: 'What is the new role salary'
-        }, {
-            type: 'choices',
-            name: 'roleDept',
-            message: 'What department does the new role fall under?',
-            choices: deptChoices
-        }
-    ]).then((data) => {
-        connection.query(
-            'INSERT INTO role SET ?',
-            {
-                title: data.roleTitle,
-                salary: data.roleSalary,
-                department_id: data.roleDept
-            },
-            (err, res) => {
-                console.log(res);
-                // foreign key constraints error again department_id ??
-                if (err) throw err;
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'roleTitle',
+                    message: 'What is the new role title?'
+                }, {
+                    type: 'input',
+                    name: 'roleSalary',
+                    message: 'What is the new role salary'
+                }, {
+                    type: 'list',
+                    name: 'roleDept',
+                    message: 'What department does the new role fall under?',
+                    choices: deptArr
+                }
+            ]).then((data) => {
+                connection.query(
+                    'INSERT INTO role SET ?',
+                    {
+                        title: data.roleTitle,
+                        salary: data.roleSalary,
+                        department_id: data.roleDept
+                    },
+                    (err, res) => {
+                        console.log(res);
+                        // foreign key constraints error again department_id ??
+                        if (err) throw err;
+                    })
             })
-    })
+        })
 
 };
 
@@ -267,14 +255,15 @@ addDept = () => {
         connection.query(
             'INSERT INTO department SET ?',
             {
-             name: data.dept,
+                name: data.dept,
             }, (err, res) => {
                 console.log(res);
                 // can't see whether dept added
                 if (err) throw err;
             })
     }
-    )};
+    )
+};
 
 // UPDATE EMPLOYEE ROLE FUNCTION
 updateEmployeeRole = () => {
