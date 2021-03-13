@@ -8,6 +8,7 @@ require('dotenv').config();
 var roleArr = [];
 var managerArr = [];
 var deptArr = [];
+var employeeArr = [];
 
 // Connecting to database
 const connection = mysql.createConnection({
@@ -138,8 +139,8 @@ addEmployee = () => {
         if (data.managerChoice == 'Yes') {
             selectManager(data);
         } else {
-            const roleId = selectRole().indexOf(data.roleChoice) + 1
-            connection.query("INSERT INTO employee SET ?", {
+            const roleId = selectRole().indexOf(data.roleChoice) + 1;
+            connection.query('INSERT INTO employee SET ?', {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 role_id: roleId,
@@ -161,9 +162,9 @@ selectRole = () => {
             for (let i = 0; i < res.length; i++) {
                 roleArr.push(res[i].title)
             }
-            return roleArr;
         }
     )
+    return roleArr;
 }
 
 selectManager = (data) => {
@@ -182,12 +183,13 @@ selectManager = (data) => {
                 choices: managerArr
             }).then((response) => {
                 const roleId = selectRole().indexOf(data.roleChoice) + 1;
-                console.log(response);
-                const managerId = response.manager; // foreign key constrainst error - need to find the employee ID of the manager
-                connection.query("INSERT INTO employee SET ?", {
+                console.log(roleId);
+                console.log(response.manager);
+                const managerId = response.manager; 
+                connection.query('INSERT INTO employee SET ?', {
                     first_name: data.firstName,
                     last_name: data.lastName,
-                    role_id: roleId,
+                    role_id: roleId, // foreign key constraint fail error BUT WHYYYY
                     manager_id: managerId
                 }, (err, res) => {
                     viewAllEmployees();
@@ -196,7 +198,6 @@ selectManager = (data) => {
             })
         }
     )
-
 }
 
 // ADD ROLES FUNCTION
@@ -233,13 +234,14 @@ addRole = () => {
                         department_id: data.roleDept
                     },
                     (err, res) => {
-                        console.log(res);
-                        // foreign key constraints error again department_id ??
+                        // console.log(res);
+                        console.table(data);
                         if (err) throw err;
-                    })
+                    }
+                )
             })
-        })
-
+        }
+    )
 };
 
 // ADD DEPARTMENT FUNCTION 
@@ -257,17 +259,61 @@ addDept = () => {
             {
                 name: data.dept,
             }, (err, res) => {
-                console.log(res);
+                // console.log(res);
                 // can't see whether dept added
+                console.table(data);
                 if (err) throw err;
-            })
-    }
-    )
+            }
+        )
+    })
 };
 
 // UPDATE EMPLOYEE ROLE FUNCTION
 updateEmployeeRole = () => {
     console.log('update employee');
+    connection.query(
+        'SELECT employee.first_name, employee.last_name, employee.id, employee.role_id, role.title FROM employee JOIN role ON employee.role_id = role.id;',
+        (err, res) => {
+            if (err) throw err;
+            // console.log(res);
+            for (let i = 0; i < res.length; i++) {
+                let employeeName = { name: `${res[i].first_name} ${res[i].last_name}`, value: res[i].id };
+                employeeArr.push(employeeName)
+                // let updatedRole = { name: res[i].title, value: res[i].role_id };
+                // console.log(updatedRole);
+                // roleArr.push(updatedRole);
+            }
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'updateName',
+                    message: 'Which employee would you like to update?',
+                    choices: employeeArr
+                }, {
+                    type: 'list',
+                    name: 'updateRole',
+                    message: 'What is the new role of the employee?',
+                    choices: selectRole()
+                }
+            ]).then((update) => {
+                console.log(update);
+                const roleId = selectRole().indexOf(update.updateRole) + 1;
+                const empToUpdate = update.updateName;
+                //const roleToUpdate = update.updateRole;
+                connection.query(
+                    `UPDATE employee SET role_id = ${empToUpdate} WHERE id = ${roleId}`,
+                    // {
+                    //     id: empToUpdate,
+                    //     role_id: roleToUpdate
+                    // },
+                    (err, res) => {
+                        viewAllEmployees();
+                        if (err) throw err;
+                    }
+                )
+            })
+        }
+    )
 };
 
 endSession = () => {
