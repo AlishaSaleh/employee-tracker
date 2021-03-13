@@ -299,13 +299,8 @@ updateEmployeeRole = () => {
                 console.log(update);
                 const roleId = selectRole().indexOf(update.updateRole) + 1;
                 const empToUpdate = update.updateName;
-                //const roleToUpdate = update.updateRole;
                 connection.query(
-                    `UPDATE employee SET role_id = ${empToUpdate} WHERE id = ${roleId}`,
-                    // {
-                    //     id: empToUpdate,
-                    //     role_id: roleToUpdate
-                    // },
+                    `UPDATE employee SET role_id = ${roleId} WHERE id = ${empToUpdate}`,
                     (err, res) => {
                         viewAllEmployees();
                         if (err) throw err;
