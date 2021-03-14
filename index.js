@@ -5,10 +5,10 @@ const cTable = require('console.table');
 require('dotenv').config();
 
 // Arrays to be populated
-var roleArr = [];
-var managerArr = [];
-var deptArr = [];
-var employeeArr = [];
+const roleArr = [];
+const managerArr = [];
+const deptArr = [];
+const employeeArr = [];
 
 // Connecting to database
 const connection = mysql.createConnection({
@@ -22,7 +22,6 @@ const connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log(`Connected as ID ${connection.threadId}`);
-    // call inquirier prompt function here
     startMenu();
 });
 
@@ -75,7 +74,7 @@ startMenu = () => {
 
 // ------------------------ VIEW ALL EMPLOYEES FUNCTION ------------------------
 viewAllEmployees = () => {
-    console.log('view employees');
+    // console.log('view employees');
     connection.query(
         "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(m.first_name, ' ', m.last_name) AS manager FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id LEFT JOIN employee m ON employee.manager_id = m.id;",
         (err, res) => {
@@ -88,7 +87,7 @@ viewAllEmployees = () => {
 
 // ------------------------ VIEW EMPLOYEES BY ROLE FUNCTION ------------------------
 viewEmployeeRoles = () => {
-    console.log('view roles');
+    // console.log('view roles');
     connection.query(
         "SELECT employee.first_name, employee.last_name, role.title AS role FROM employee JOIN role ON employee.role_id = role.id;",
         (err, res) => {
