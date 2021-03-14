@@ -73,7 +73,7 @@ startMenu = () => {
     });
 };
 
-// VIEW ALL EMPLOYEES FUNCTION
+// ------------------------ VIEW ALL EMPLOYEES FUNCTION ------------------------
 viewAllEmployees = () => {
     console.log('view employees');
     connection.query(
@@ -86,7 +86,7 @@ viewAllEmployees = () => {
     )
 };
 
-// VIEW EMPLOYEES BY ROLE FUNCTION 
+// ------------------------ VIEW EMPLOYEES BY ROLE FUNCTION ------------------------
 viewEmployeeRoles = () => {
     console.log('view roles');
     connection.query(
@@ -99,7 +99,7 @@ viewEmployeeRoles = () => {
     )
 };
 
-// VIEW EMPLOYEES BY DEPARTMENT FUNCTION
+// ------------------------ VIEW EMPLOYEES BY DEPARTMENT FUNCTION ------------------------
 viewEmployeeDept = () => {
     console.log('view dept');
     connection.query(
@@ -112,7 +112,7 @@ viewEmployeeDept = () => {
     )
 };
 
-// ADD EMPLOYEES FUNCTION
+// -------------------------- ADD EMPLOYEES FUNCTIONS ----------------------
 addEmployee = () => {
     console.log('add employee');
     inquirer.prompt([
@@ -169,7 +169,7 @@ selectRole = () => {
 
 selectManager = (data) => {
     connection.query(
-        'SELECT first_name, last_name, id FROM employee WHERE manager_id IS NULL',
+        'SELECT first_name, last_name, id FROM employee WHERE manager_id IS NULL;',
         (err, res) => {
             if (err) throw err;
             for (let i = 0; i < res.length; i++) {
@@ -189,9 +189,10 @@ selectManager = (data) => {
                 connection.query('INSERT INTO employee SET ?', {
                     first_name: data.firstName,
                     last_name: data.lastName,
-                    role_id: roleId, // foreign key constraint fail error BUT WHYYYY
+                    role_id: roleId,
                     manager_id: managerId
                 }, (err, res) => {
+                    console.table(data)
                     viewAllEmployees();
                     if (err) throw err;
                 });
@@ -200,7 +201,7 @@ selectManager = (data) => {
     )
 }
 
-// ADD ROLES FUNCTION
+// ------------------------ ADD ROLES FUNCTION ------------------------
 addRole = () => {
     console.log('add role');
     connection.query(
@@ -244,7 +245,7 @@ addRole = () => {
     )
 };
 
-// ADD DEPARTMENT FUNCTION 
+// ------------------------ ADD DEPARTMENT FUNCTION ------------------------
 addDept = () => {
     console.log('add dept');
     inquirer.prompt(
@@ -268,20 +269,16 @@ addDept = () => {
     })
 };
 
-// UPDATE EMPLOYEE ROLE FUNCTION
+// ------------------------ UPDATE EMPLOYEE ROLE FUNCTION ------------------------
 updateEmployeeRole = () => {
     console.log('update employee');
     connection.query(
         'SELECT employee.first_name, employee.last_name, employee.id, employee.role_id, role.title FROM employee JOIN role ON employee.role_id = role.id;',
         (err, res) => {
             if (err) throw err;
-            // console.log(res);
             for (let i = 0; i < res.length; i++) {
                 let employeeName = { name: `${res[i].first_name} ${res[i].last_name}`, value: res[i].id };
                 employeeArr.push(employeeName)
-                // let updatedRole = { name: res[i].title, value: res[i].role_id };
-                // console.log(updatedRole);
-                // roleArr.push(updatedRole);
             }
             inquirer.prompt([
                 {
@@ -312,7 +309,7 @@ updateEmployeeRole = () => {
 };
 
 endSession = () => {
-    console.log('Thank for using Employee Tracker. This session has now ended.');
+    console.log('Thank you for using Employee Tracker. This session has now ended.');
     connection.end();
     process.exit();
 };
