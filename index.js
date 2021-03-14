@@ -183,8 +183,8 @@ selectManager = (data) => {
                 choices: managerArr
             }).then((response) => {
                 const roleId = data.roleChoice
-                console.log(roleId);
-                console.log(response.manager);
+                // console.log(roleId);
+                // console.log(response.manager);
                 const managerId = response.manager; 
                 connection.query('INSERT INTO employee SET ?', {
                     first_name: data.firstName,
@@ -262,7 +262,6 @@ addDept = () => {
                 name: data.dept,
             }, (err, res) => {
                 // console.log(res);
-                // can't see whether dept added
                 // console.table(data);
                 startMenu();
                 if (err) throw err;
@@ -295,7 +294,7 @@ updateEmployeeRole = () => {
                     choices: selectRole()
                 }
             ]).then((update) => {
-                console.log(update);
+                // console.log(update);
                 const roleId = update.updateRole;
                 const empToUpdate = update.updateName;
                 connection.query(
