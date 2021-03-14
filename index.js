@@ -101,7 +101,7 @@ viewEmployeeRoles = () => {
 
 // ------------------------ VIEW EMPLOYEES BY DEPARTMENT FUNCTION ------------------------
 viewEmployeeDept = () => {
-    console.log('view dept');
+    // console.log('view dept');
     connection.query(
         "SELECT employee.first_name, employee.last_name, department.name AS department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;",
         (err, res) => {
@@ -114,7 +114,7 @@ viewEmployeeDept = () => {
 
 // -------------------------- ADD EMPLOYEES FUNCTIONS ----------------------
 addEmployee = () => {
-    console.log('add employee');
+    // console.log('add employee');
     inquirer.prompt([
         {
             type: 'input',
@@ -146,8 +146,8 @@ addEmployee = () => {
                 role_id: roleId,
                 manager_id: null
             }, (err, res) => {
-                console.table(data)
-                startMenu();
+                // console.table(data)
+                viewAllEmployees();
                 if (err) throw err;
             });
         }
@@ -193,7 +193,7 @@ selectManager = (data) => {
                     role_id: roleId,
                     manager_id: managerId
                 }, (err, res) => {
-                    console.table(data)
+                    // console.table(data)
                     viewAllEmployees();
                     if (err) throw err;
                 });
@@ -204,7 +204,7 @@ selectManager = (data) => {
 
 // ------------------------ ADD ROLES FUNCTION ------------------------
 addRole = () => {
-    console.log('add role');
+    // console.log('add role');
     connection.query(
         'SELECT * FROM department',
         (err, res) => {
@@ -237,7 +237,8 @@ addRole = () => {
                     },
                     (err, res) => {
                         // console.log(res);
-                        console.table(data);
+                        // console.table(data);
+                        startMenu();
                         if (err) throw err;
                     }
                 )
@@ -248,7 +249,7 @@ addRole = () => {
 
 // ------------------------ ADD DEPARTMENT FUNCTION ------------------------
 addDept = () => {
-    console.log('add dept');
+    // console.log('add dept');
     inquirer.prompt(
         {
             type: 'input',
@@ -263,7 +264,8 @@ addDept = () => {
             }, (err, res) => {
                 // console.log(res);
                 // can't see whether dept added
-                console.table(data);
+                // console.table(data);
+                startMenu();
                 if (err) throw err;
             }
         )
@@ -272,7 +274,7 @@ addDept = () => {
 
 // ------------------------ UPDATE EMPLOYEE ROLE FUNCTION ------------------------
 updateEmployeeRole = () => {
-    console.log('update employee');
+    // console.log('update employee');
     connection.query(
         'SELECT employee.first_name, employee.last_name, employee.id, employee.role_id, role.title FROM employee JOIN role ON employee.role_id = role.id;',
         (err, res) => {
