@@ -139,7 +139,7 @@ addEmployee = () => {
         if (data.managerChoice == 'Yes') {
             selectManager(data);
         } else {
-            const roleId = selectRole().indexOf(data.roleChoice) + 1;
+            const roleId = data.roleChoice;
             connection.query('INSERT INTO employee SET ?', {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -160,7 +160,8 @@ selectRole = () => {
         (err, res) => {
             if (err) throw err;
             for (let i = 0; i < res.length; i++) {
-                roleArr.push(res[i].title)
+                let newEmpRole = { name: res[i].title, value: res[i].id };
+                roleArr.push(newEmpRole)
             }
         }
     )
@@ -182,7 +183,7 @@ selectManager = (data) => {
                 message: 'Please enter their manager',
                 choices: managerArr
             }).then((response) => {
-                const roleId = selectRole().indexOf(data.roleChoice) + 1;
+                const roleId = data.roleChoice
                 console.log(roleId);
                 console.log(response.manager);
                 const managerId = response.manager; 
@@ -294,7 +295,7 @@ updateEmployeeRole = () => {
                 }
             ]).then((update) => {
                 console.log(update);
-                const roleId = selectRole().indexOf(update.updateRole) + 1;
+                const roleId = update.updateRole;
                 const empToUpdate = update.updateName;
                 connection.query(
                     `UPDATE employee SET role_id = ${roleId} WHERE id = ${empToUpdate}`,
